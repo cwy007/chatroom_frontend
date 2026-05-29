@@ -5,11 +5,19 @@ import Register from "@/pages/Register";
 import UpdatePassword from "@/pages/UpdatePassword";
 import { ConfigProvider } from "antd";
 import zhCN from "antd/locale/zh_CN";
+import { Index } from "./pages/Index";
+import { UpdateInfo } from "./pages/UpdateInfo";
 
 const routes = [
   {
     path: "/",
-    element: <div>index</div>,
+    element: <Index />,
+    children: [
+      {
+        path: "update_info",
+        element: <UpdateInfo />,
+      },
+    ],
   },
   {
     path: "/login",

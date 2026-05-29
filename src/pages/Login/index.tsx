@@ -15,6 +15,8 @@ const onFinish = async (values: LoginUser) => {
 
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userInfo", JSON.stringify(res.data.user));
+
+      window.location.href = "/";
     }
   } catch (e: any) {
     message.error(e.response?.data?.message || "系统繁忙，请稍后再试");
