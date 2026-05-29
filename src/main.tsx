@@ -3,6 +3,8 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import UpdatePassword from "@/pages/UpdatePassword";
+import { ConfigProvider } from "antd";
+import zhCN from "antd/locale/zh_CN";
 
 const routes = [
   {
@@ -27,4 +29,8 @@ const router = createBrowserRouter(routes);
 
 const root = createRoot(document.getElementById("root")!);
 
-root.render(<RouterProvider router={router} />);
+root.render(
+  <ConfigProvider locale={zhCN}>
+    <RouterProvider router={router} />
+  </ConfigProvider>,
+);
