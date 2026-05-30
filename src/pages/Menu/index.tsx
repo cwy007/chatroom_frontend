@@ -3,6 +3,7 @@ import { Menu as AntdMenu, type MenuProps } from "antd";
 import "./index.css";
 import { type MenuClickEventHandler } from "rc-menu/lib/interface";
 import { router } from "../../main";
+import { useEffect, useState } from "react";
 
 const items: MenuProps["items"] = [
   {
@@ -51,6 +52,7 @@ const handleMenuItemClick: MenuClickEventHandler = (info) => {
 
 function Menu() {
   const location = useLocation();
+  const [selectedKeys, setSelectedKeys] = useState<string[]>();
 
   function getSelectedKeys() {
     if (location.pathname === "/group") {
@@ -66,14 +68,14 @@ function Menu() {
     }
   }
 
+  useEffect(() => {
+    setSelectedKeys(getSelectedKeys());
+  }, [location.pathname]);
+
   return (
     <div id="menu-container">
       <div className="menu-area">
-        <AntdMenu
-          defaultSelectedKeys={getSelectedKeys()}
-          items={items}
-          onClick={handleMenuItemClick}
-        />
+        <AntdMenu selectedKeys={selectedKeys} items={items} onClick={handleMenuItemClick} />
       </div>
       <div className="content-area">
         <Outlet></Outlet>

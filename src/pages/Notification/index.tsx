@@ -92,6 +92,10 @@ export function Notification() {
 
   const toMeColumns: ColumnsType<FriendRequest> = [
     {
+      title: "fromUserId",
+      dataIndex: "fromUserId",
+    },
+    {
       title: "用户",
       render: (_, record) => {
         return (
@@ -141,6 +145,10 @@ export function Notification() {
   ];
 
   const fromMeColumns: ColumnsType<FriendRequest> = [
+    {
+      title: "toUserId",
+      dataIndex: "toUserId",
+    },
     {
       title: "用户",
       render: (_, record) => {

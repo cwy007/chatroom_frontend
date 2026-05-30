@@ -3,8 +3,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import "./index.css";
 import { type ColumnsType } from "antd/es/table";
 import { useForm } from "antd/es/form/Form";
-import { friendshipList } from "@/interfaces";
+import { createOneToOne, findChatroom, friendshipList } from "@/interfaces";
 import AddFriendModal from "./AddFriendModal";
+import { useNavigate } from "react-router-dom";
+import { getUserInfo } from "@/pages/Chat";
 
 interface SearchFriend {
   name: string;
@@ -22,8 +24,42 @@ function Friendship() {
   const [friendshipResult, setFriendshipResult] = useState<Array<FriendshipSearchResult>>([]);
   const [isAddFriendModalOpen, setAddFriendModalOpen] = useState(false);
 
+  const navigate = useNavigate();
+
+  async function goToChat(friendId: number) {
+    const userId = (getUserInfo() as any).id;
+    try {
+      const res = await findChatroom(userId, friendId);
+
+      if (res.data) {
+        navigate("/chat", {
+          state: {
+            chatroomId: res.data?.id,
+          },
+        });
+      } else {
+        const res2 = await createOneToOne(friendId);
+        navigate("/chat", {
+          state: {
+            chatroomId: res2.data?.id,
+          },
+        });
+      }
+    } catch (e: any) {
+      message.error(e.response?.data?.message || "系统繁忙，请稍后再试");
+    }
+  }
+
   const columns: ColumnsType<FriendshipSearchResult> = useMemo(
     () => [
+      {
+        title: "ID",
+        dataIndex: "id",
+      },
+      {
+        title: "用户名",
+        dataIndex: "username",
+      },
       {
         title: "昵称",
         dataIndex: "nickname",
@@ -45,7 +81,14 @@ function Friendship() {
         title: "操作",
         render: (_, record) => (
           <div>
-            <a href="#">聊天</a>
+            <a
+              href="#"
+              onClick={() => {
+                goToChat(record.id);
+              }}
+            >
+              聊天
+            </a>
           </div>
         ),
       },
