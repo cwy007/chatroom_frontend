@@ -2,7 +2,7 @@ import { Button, Image, message, Popover } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import "./index.scss";
-import { chatroomList, chatHistoryList } from "@/interfaces";
+import { chatroomList, chatHistoryList, favoriteAdd } from "@/interfaces";
 import type { UserInfo } from "../UpdateInfo";
 import TextArea from "antd/es/input/TextArea";
 import { useLocation } from "react-router-dom";
@@ -211,6 +211,18 @@ function Chat() {
     }
   };
 
+  async function addToFavorite(chatHistoryId: number) {
+    try {
+      const res = await favoriteAdd(chatHistoryId);
+
+      if (res.status === 201 || res.status === 200) {
+        message.success("收藏成功");
+      }
+    } catch (e: any) {
+      message.error(e.response?.data?.message || "系统繁忙，请稍后再试");
+    }
+  }
+
   return (
     <div id="chat-container">
       <div className="chat-room-list">
@@ -237,6 +249,9 @@ function Chat() {
               className={`message-item ${item.senderId === userInfo.id ? "from-me" : ""}`}
               data-id={item.id}
               key={item.id}
+              onDoubleClick={() => {
+                addToFavorite(item.id);
+              }}
             >
               <div className="message-sender">
                 <Image src={item.sender.headPic} />

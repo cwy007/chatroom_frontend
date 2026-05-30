@@ -162,3 +162,23 @@ export async function createGroup(name: string) {
 export async function presignedUrl(fileName: string) {
   return axiosInstance.get(`/file/presigned-url?fileName=${fileName}`);
 }
+
+export async function queryFavoriteList() {
+  return axiosInstance.get(`/favorite/list`);
+}
+
+export async function favoriteAdd(chatHistoryId: number) {
+  return axiosInstance.get(`/favorite/add`, {
+    params: {
+      chatHistoryId
+    }
+  });
+}
+
+export async function favoriteDel(id: number) {
+  return axiosInstance.get(`/favorite/del`, {
+    params: {
+      id
+    }
+  });
+}
