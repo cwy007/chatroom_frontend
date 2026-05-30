@@ -1,4 +1,4 @@
-import { Button, Input, message } from "antd";
+import { Button, Input, message, Popover } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import "./index.scss";
@@ -6,6 +6,8 @@ import { chatroomList, chatHistoryList } from "@/interfaces";
 import type { UserInfo } from "../UpdateInfo";
 import TextArea from "antd/es/input/TextArea";
 import { useLocation } from "react-router-dom";
+import EmojiPicker from "@emoji-mart/react";
+import emojiData from "@emoji-mart/data";
 
 interface JoinRoomPayload {
   chatroomId: number;
@@ -218,7 +220,19 @@ function Chat() {
 
       <div className="message-input">
         <div className="message-type">
-          <div className="message-type-item">文本</div>
+          <Popover
+            trigger="click"
+            content={
+              <EmojiPicker
+                data={emojiData}
+                onEmojiSelect={(emoji: any) => {
+                  setInputText((prev) => prev + emoji.native);
+                }}
+              />
+            }
+          >
+            <div className="message-type-item">表情</div>
+          </Popover>
           <div className="message-type-item">图片</div>
           <div className="message-type-item">文件</div>
         </div>

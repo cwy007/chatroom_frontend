@@ -79,8 +79,11 @@
 
     .message-type {
       display: flex;
+      gap: 10px;
 
       .message-type-item {
+        cursor: pointer;
+        display: inline-block;
         width: 100px;
         &:hover {
           font-weight: bold;
