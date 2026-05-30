@@ -88,3 +88,11 @@ export async function updateUserInfoCaptcha(email: string) {
     }
   });
 }
+
+export async function friendshipList(nickname?: string) {
+  return axiosInstance.get(`/friendship/list?nickname=${nickname || ''}`);
+}
+
+export async function chatroomList(name: string) {
+  return axiosInstance.get(`/chatroom/list?name=${name}`);
+}
