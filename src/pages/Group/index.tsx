@@ -12,7 +12,8 @@ interface SearchGroup {
 interface GroupSearchResult {
   id: number;
   name: string;
-  createTime: Date;
+  type: number;
+  createdAt: Date;
 }
 
 function Group() {
@@ -25,8 +26,16 @@ function Group() {
         dataIndex: "name",
       },
       {
+        title: "类型",
+        render: (_, record) => {
+          return record.type ? "群聊" : "单聊";
+        },
+      },
+      {
         title: "创建时间",
-        dataIndex: "createdAt",
+        render: (_, record) => {
+          return new Date(record.createdAt).toLocaleString();
+        },
       },
       {
         title: "操作",
