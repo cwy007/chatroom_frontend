@@ -158,3 +158,7 @@ export async function createGroup(name: string) {
     }
   });
 }
+
+export async function presignedUrl(fileName: string) {
+  return axiosInstance.get(`/file/presigned-url?fileName=${fileName}`);
+}

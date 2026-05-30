@@ -1,4 +1,4 @@
-import { Button, Input, message, Popover } from "antd";
+import { Button, Image, message, Popover } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import "./index.scss";
@@ -8,6 +8,7 @@ import TextArea from "antd/es/input/TextArea";
 import { useLocation } from "react-router-dom";
 import EmojiPicker from "@emoji-mart/react";
 import emojiData from "@emoji-mart/data";
+import { UploadImageModal } from "./UploadImageModal";
 
 interface JoinRoomPayload {
   chatroomId: number;
@@ -20,8 +21,10 @@ interface SendMessagePayload {
   message: Message;
 }
 
+type MessageType = 0 | 1 | 2; // 0: 文本消息，1：图片消息，2：文件消息
+
 interface Message {
-  type: "text" | "image";
+  type: MessageType;
   content: string;
 }
 
@@ -39,7 +42,7 @@ type Reply =
 interface ChatHistory {
   id: number;
   content: string;
-  type: number;
+  type: MessageType;
   chatroomId: number;
   senderId: number;
   createTime: Date;
@@ -72,6 +75,7 @@ function Chat() {
   const [roomId, setRoomId] = useState<number>();
   const userInfo = getUserInfo();
   const location = useLocation();
+  const [isUploadImageModalOpen, setUploadImageModalOpen] = useState(false);
 
   useEffect(() => {
     queryChatroomList();
@@ -147,6 +151,7 @@ function Chat() {
       socket.emit("joinRoom", payload);
 
       socket.on("message", (reply: Reply) => {
+        console.log("收到消息", reply);
         if (reply.type === "sendMessage") {
           setChatHistory((prev) => [...(prev || []), reply.message]);
           setTimeout(() => {
@@ -161,7 +166,7 @@ function Chat() {
     };
   }, [roomId]);
 
-  function sendMessage(value: string) {
+  function sendMessage(value: string, type: MessageType = 0) {
     if (!value) {
       return;
     }
@@ -172,13 +177,27 @@ function Chat() {
       sendUserId: getUserInfo().id,
       chatroomId: roomId,
       message: {
-        type: "text",
+        type,
         content: value,
       },
     };
 
     socketRef.current?.emit("sendMessage", payload);
   }
+
+  const renderMessageContent = (message: ChatHistory) => {
+    if (message.type === 0) {
+      return message.content;
+    } else if (message.type === 1) {
+      return <Image src={message.content} style={{ maxWidth: "200px" }} />;
+    } else if (message.type === 2) {
+      return (
+        <a href={message.content} target="_blank" rel="noopener noreferrer">
+          下载文件
+        </a>
+      );
+    }
+  };
 
   return (
     <div id="chat-container">
@@ -208,10 +227,10 @@ function Chat() {
               key={item.id}
             >
               <div className="message-sender">
-                <img src={item.sender.headPic} />
+                <Image src={item.sender.headPic} />
                 <span className="sender-nickname">{item.sender.nickname}</span>
               </div>
-              <div className="message-content">{item.content}</div>
+              <div className="message-content">{renderMessageContent(item)}</div>
             </div>
           );
         })}
@@ -233,7 +252,14 @@ function Chat() {
           >
             <div className="message-type-item">表情</div>
           </Popover>
-          <div className="message-type-item">图片</div>
+          <div
+            className="message-type-item"
+            onClick={() => {
+              setUploadImageModalOpen(true);
+            }}
+          >
+            图片
+          </div>
           <div className="message-type-item">文件</div>
         </div>
         <div className="message-input-area">
@@ -254,6 +280,20 @@ function Chat() {
           </Button>
         </div>
       </div>
+
+      <UploadImageModal
+        isOpen={isUploadImageModalOpen}
+        handleClose={(src) => {
+          setUploadImageModalOpen(false);
+          console.log("图片地址", src);
+          // if (src) {
+          //   sendMessage(src, 1);
+          // }
+          const testSrc =
+            "https://cdn.jsdelivr.net/gh/cwy007/pic_bed@main/images/60249ce21c284c928086815fec6801e9~tplv-k3u1fbpfcp-jj-mark%3A3024%3A0%3A0%3A0%3Aq75.awebp";
+          sendMessage(testSrc, 1);
+        }}
+      />
     </div>
   );
 }
