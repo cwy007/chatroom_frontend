@@ -4,9 +4,10 @@ import Dragger, { type DraggerProps } from "antd/es/upload/Dragger";
 import axios from "axios";
 import { presignedUrl } from "../../interfaces";
 
-interface ImageUploadProps {
+interface FileUploadProps {
   value?: string;
   onChange?: Function;
+  type?: "image" | "file";
 }
 
 let onChange: Function;
@@ -44,12 +45,18 @@ const dragger = (
   </Dragger>
 );
 
-export function ImageUpload(props: ImageUploadProps) {
+export function FileUpload(props: FileUploadProps) {
   onChange = props.onChange!;
 
   return props?.value ? (
     <div>
-      <img src={props.value} alt="图片" width="100" height="100" />
+      {props.type === "image" ? (
+        <img src={props.value} alt="图片" width="100" height="100" />
+      ) : (
+        <a href={props.value} target="_blank" rel="noopener noreferrer">
+          下载文件
+        </a>
+      )}
       {dragger}
     </div>
   ) : (

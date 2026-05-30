@@ -8,7 +8,7 @@ import TextArea from "antd/es/input/TextArea";
 import { useLocation } from "react-router-dom";
 import EmojiPicker from "@emoji-mart/react";
 import emojiData from "@emoji-mart/data";
-import { UploadImageModal } from "./UploadImageModal";
+import { UploadModal } from "./UploadModal";
 
 interface JoinRoomPayload {
   chatroomId: number;
@@ -21,7 +21,7 @@ interface SendMessagePayload {
   message: Message;
 }
 
-type MessageType = 0 | 1 | 2; // 0: 文本消息，1：图片消息，2：文件消息
+type MessageType = "text" | "image" | "file";
 
 interface Message {
   type: MessageType;
@@ -42,7 +42,7 @@ type Reply =
 interface ChatHistory {
   id: number;
   content: string;
-  type: MessageType;
+  type: 0 | 1 | 2; // 0: 文本，1：图片，2：文件
   chatroomId: number;
   senderId: number;
   createTime: Date;
@@ -75,7 +75,8 @@ function Chat() {
   const [roomId, setRoomId] = useState<number>();
   const userInfo = getUserInfo();
   const location = useLocation();
-  const [isUploadImageModalOpen, setUploadImageModalOpen] = useState(false);
+  const [isUploadModalOpen, setUploadModalOpen] = useState(false);
+  const [uploadType, setUploadType] = useState<"image" | "file">("image");
 
   useEffect(() => {
     queryChatroomList();
@@ -166,7 +167,7 @@ function Chat() {
     };
   }, [roomId]);
 
-  function sendMessage(value: string, type: MessageType = 0) {
+  function sendMessage(value: string, type: MessageType = "text") {
     if (!value) {
       return;
     }
@@ -192,9 +193,20 @@ function Chat() {
       return <Image src={message.content} style={{ maxWidth: "200px" }} />;
     } else if (message.type === 2) {
       return (
-        <a href={message.content} target="_blank" rel="noopener noreferrer">
-          下载文件
-        </a>
+        <div
+          style={{
+            color: "blue",
+            textDecoration: "underline",
+            cursor: "pointer",
+            maxWidth: "400px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+          onClick={() => window.open(message.content)}
+        >
+          {message.content}
+        </div>
       );
     }
   };
@@ -255,12 +267,21 @@ function Chat() {
           <div
             className="message-type-item"
             onClick={() => {
-              setUploadImageModalOpen(true);
+              setUploadModalOpen(true);
+              setUploadType("image");
             }}
           >
             图片
           </div>
-          <div className="message-type-item">文件</div>
+          <div
+            className="message-type-item"
+            onClick={() => {
+              setUploadModalOpen(true);
+              setUploadType("file");
+            }}
+          >
+            文件
+          </div>
         </div>
         <div className="message-input-area">
           <TextArea
@@ -281,17 +302,18 @@ function Chat() {
         </div>
       </div>
 
-      <UploadImageModal
-        isOpen={isUploadImageModalOpen}
+      <UploadModal
+        type={uploadType}
+        isOpen={isUploadModalOpen}
         handleClose={(src) => {
-          setUploadImageModalOpen(false);
-          console.log("图片地址", src);
+          setUploadModalOpen(false);
+          // console.log("图片地址", src);
           // if (src) {
           //   sendMessage(src, 1);
           // }
           const testSrc =
             "https://cdn.jsdelivr.net/gh/cwy007/pic_bed@main/images/60249ce21c284c928086815fec6801e9~tplv-k3u1fbpfcp-jj-mark%3A3024%3A0%3A0%3A0%3Aq75.awebp";
-          sendMessage(testSrc, 1);
+          sendMessage(testSrc, uploadType === "image" ? "image" : "file");
         }}
       />
     </div>
