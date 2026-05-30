@@ -64,7 +64,6 @@ export function getUserInfo() {
 }
 
 function Chat() {
-  const [messageList, setMessageList] = useState<Array<Message>>([]);
   const socketRef = useRef<Socket>(null);
   const [roomList, setRoomList] = useState<Array<Chatroom>>();
   const [inputText, setInputText] = useState("");
@@ -75,6 +74,12 @@ function Chat() {
   useEffect(() => {
     queryChatroomList();
   }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      document.getElementById("bottom-bar")?.scrollIntoView({ block: "end" });
+    }, 300);
+  }, [roomId]);
 
   const [chatHistory, setChatHistory] = useState<Array<ChatHistory>>();
 
